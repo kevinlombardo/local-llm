@@ -64,7 +64,9 @@ brew services start ollama
 ollama pull llama3.3:70b
 ```
 
-## 4. Performance Benchmarks
+---
+
+## 3. Performance Benchmarks
 **Model:** Llama 3.3 70B (4-bit Quantization)
 **Hardware:** Apple M4 Max (128GB Unified Memory)
 
@@ -74,3 +76,28 @@ ollama pull llama3.3:70b
 * **Prompt Processing (Prefill):** 44.72 tokens/s
 * **Cold Boot Load Time:** ~11.1 seconds
     * *Note:* Time required to load ~42GB model weights from NVMe SSD to Unified Memory. Subsequent inference requests eliminate this latency (hot-swapping).
+ 
+---
+
+## 4. Frontend Deployment (Open WebUI)
+
+### 4.1 Container Architecture
+To provide a user-friendly interface without the overhead of a GUI-based hypervisor, **Colima** was utilized as the headless container runtime.
+
+* **Runtime:** Colima (QEMU-based) via Docker CLI.
+* **Orchestration:** Docker Container running `ghcr.io/open-webui/open-webui:main`.
+* **Networking Strategy:**
+    * Used `--add-host=host.docker.internal:host-gateway` to bridge the containerized application to the bare-metal Ollama API.
+    * Port Mapping: Host `3000` $\rightarrow$ Container `8080`.
+
+### 4.2 Deployment Command
+The application was deployed in detached mode with an auto-restart policy to ensure resilience.
+
+```bash
+docker run -d \
+  -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
