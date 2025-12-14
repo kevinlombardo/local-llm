@@ -1,78 +1,54 @@
-# Project: Headless Local LLM Inference Server
+# Project: High-Performance Headless AI Inference Server
 
 ## 1. Project Overview
-This project documents the engineering and deployment of a high-performance, local AI inference server. The goal was to leverage Apple Silicon's Unified Memory Architecture to run large-scale (70B+) parameter models in a headless, zero-touch environment, exposing an API for network-wide consumption.
+This project details the engineering, configuration, and deployment of a private, enterprise-grade Generative AI server hosted on Apple Silicon.
 
-## 2. Infrastructure & Environment Setup
+The primary objective was to leverage the **Unified Memory Architecture (UMA)** of the **Mac Studio (M4 Max)** to run large-scale Large Language Models (LLMs)—specifically 70B parameter models—at speeds exceeding human reading capabilities, without relying on cloud APIs or consumer-grade GPU VRAM constraints.
 
-### 2.1 Hardware Architecture
-The system is built on the Mac Studio (2025 Model) to utilize Unified Memory, which allows for loading massive model weights that exceed standard consumer GPU VRAM limits.
-* **Host:** Mac Studio
-* **SoC:** Apple M4 Max (16-Core CPU / 40-Core GPU)
-* **Memory:** 128GB Unified Memory
-* **Storage:** 1TB SSD (NVMe)
+The system is architected as a **headless, zero-touch appliance**. It resides on the local network, managed securely via SSH, and exposes an industry-standard API and a containerized web frontend for network-wide consumption.
 
-### 2.2 Network & Security Layer
-To enable secure remote administration without a physical console, a strict SSH environment was configured.
-* **Remote Access:** OpenSSH Daemon enabled via macOS Sharing Preferences.
-* **Authentication Protocol:**
-    * **Algorithm:** Ed25519 (Twisted Edwards curve).
-    * **Implementation:** Password authentication disabled in favor of Public Key Infrastructure (PKI).
-    * **Server Hardening:** Enforced strict POSIX permissions (`chmod 700 ~/.ssh` / `600 authorized_keys`).
+---
 
-## 3. Software Layer & Model Deployment
+## 2. System Architecture
 
-### 3.1 Service Orchestration
-The inference engine (Ollama) is deployed as a background daemon using Homebrew Services.
-* **Service Manager:** `launchd` (via `brew services`).
-* **Benefit:** Ensures the API endpoint is live immediately upon system boot without user intervention.
+* **Hardware Layer:** Mac Studio (M4 Max, 128GB Unified Memory)
+* **Operating System:** macOS Sequoia (Headless Configuration)
+* **Inference Engine:** Ollama (Service Daemon)
+* **Container Runtime:** Colima (QEMU-based Docker Runtime)
+* **Application Layer:** Open WebUI (Docker Container)
 
-### 3.2 Model Selection: Llama 3.3 70B
-Selected Meta's Llama 3.3 70B Instruct model to maximize the utility of the hardware's 128GB Unified Memory.
-* **Model Architecture:** 70 Billion Parameters
-* **Quantization:** 4-bit (Q4_K_M)
-* **Memory Footprint:** ~42 GB
+---
 
-### 3.3 Performance Benchmarks
-* **Token Generation Rate:** ~11.01 tokens/s (Exceeds average human reading speed).
-* **Cold Boot Load Time:** ~11.1 seconds (Time to load 42GB from SSD to RAM).
+## 3. Engineering Documentation
+The full implementation details are broken down into four distinct engineering phases.
 
-## 4. API Exposure & Service Persistence
+### [Phase 1: Infrastructure & Security](./phase1_infrastructure.md)
+* **Hardware Validation:** Leveraging 128GB Unified Memory for high-precision quantization.
+* **Remote Access:** Establishing a secure SSH environment using Ed25519 keys.
+* **Network Security:** Configuring static addressing and disabling password authentication.
 
-### 4.1 Network Architecture
-By default, the inference server binds to `127.0.0.1`. The bind address was modified to `0.0.0.0` to accept external LAN traffic.
+### [Phase 2: Software Layer & Model Deployment](./phase2_software.md)
+* **Service Orchestration:** Managing the inference engine as a background daemon using `launchd`.
+* **Model Strategy:** Acquisition and deployment of Meta's **Llama 3.3 70B**.
+* **Performance Benchmarking:** Achieving ~11 tokens/second generation speed.
 
-### 4.2 Implementation: Persistence via Launchd
-To ensure the `OLLAMA_HOST` environment variable persists across reboots, the configuration was injected directly into the service definition.
-* **File:** `/opt/homebrew/opt/ollama/homebrew.mxcl.ollama.plist`
-* **Configuration:**
-    ```xml
-    <key>EnvironmentVariables</key>
-    <dict>
-        <key>OLLAMA_HOST</key>
-        <string>0.0.0.0</string>
-    </dict>
-    ```
+### [Phase 3: API Exposure & Persistence](./phase3_api_setup.md)
+* **Network Engineering:** Modifying bind addresses to expose the API to the LAN (`0.0.0.0`).
+* **Persistence Strategy:** Injecting environment variables directly into system service definitions.
+* **Troubleshooting:** Resolving Apple Silicon specific pathing issues for service configuration.
 
-### 4.3 Troubleshooting & Resolution
-* **Issue:** Service definition file missing from standard user library.
-* **Root Cause:** Homebrew on Apple Silicon stores master definitions in the Cellar.
-* **Resolution:** Edited the source file in `/opt/homebrew/opt/ollama/` directly.
+### [Phase 4: Frontend Deployment](./phase4_frontend_setup.md)
+* **Containerization:** Deploying **Open WebUI** using Colima for headless operation.
+* **Microservices Networking:** Bridging the Docker container to the bare-metal host API.
+* **User Interface:** Providing a ChatGPT-like web experience accessible from any browser on the network.
 
-## 5. Frontend Deployment (Open WebUI)
+---
 
-### 5.1 Container Architecture
-To provide a user-friendly interface without the overhead of a GUI-based hypervisor, **Colima** was utilized as the headless container runtime.
-* **Runtime:** Colima (QEMU-based) via Docker CLI.
-* **Orchestration:** Docker Container running `ghcr.io/open-webui/open-webui:main`.
-
-### 5.2 Deployment Command
-The application was deployed with a bridge to the bare-metal host.
-```bash
-docker run -d \
-  -p 3000:8080 \
-  --add-host=host.docker.internal:host-gateway \
-  -v open-webui:/app/backend/data \
-  --name open-webui \
-  --restart always \
-  ghcr.io/open-webui/open-webui:main
+## 4. Technology Stack
+* **Host:** Apple M4 Max
+* **OS:** macOS Sequoia
+* **Shell/CLI:** Zsh, PuTTY (Client)
+* **Package Management:** Homebrew
+* **AI Backend:** Ollama
+* **Containerization:** Docker & Colima
+* **Frontend:** Open WebUI
