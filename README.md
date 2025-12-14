@@ -22,22 +22,22 @@ The system is architected as a **headless, zero-touch appliance**. It resides on
 ## 3. Engineering Documentation
 The full implementation details are broken down into four distinct engineering phases.
 
-### [Phase 1: Infrastructure & Security](./phase1_infrastructure.md)
+### [Phase 1: Infrastructure & Security](./Phase 1: Infrastructure.md)
 * **Hardware Validation:** Leveraging 128GB Unified Memory for high-precision quantization.
 * **Remote Access:** Establishing a secure SSH environment using Ed25519 keys.
 * **Network Security:** Configuring static addressing and disabling password authentication.
 
-### [Phase 2: Software Layer & Model Deployment](./phase2_software.md)
+### [Phase 2: Software Layer & Model Deployment](./Phase 2: Backend.md)
 * **Service Orchestration:** Managing the inference engine as a background daemon using `launchd`.
 * **Model Strategy:** Acquisition and deployment of Meta's **Llama 3.3 70B**.
 * **Performance Benchmarking:** Achieving ~11 tokens/second generation speed.
 
-### [Phase 3: API Exposure & Persistence](./phase3_api_setup.md)
+### [Phase 3: API Exposure & Persistence](./Phase 3: API.md)
 * **Network Engineering:** Modifying bind addresses to expose the API to the LAN (`0.0.0.0`).
 * **Persistence Strategy:** Injecting environment variables directly into system service definitions.
 * **Troubleshooting:** Resolving Apple Silicon specific pathing issues for service configuration.
 
-### [Phase 4: Frontend Deployment](./phase4_frontend_setup.md)
+### [Phase 4: Frontend Deployment](./Phase 4: Frontend.md)
 * **Containerization:** Deploying **Open WebUI** using Colima for headless operation.
 * **Microservices Networking:** Bridging the Docker container to the bare-metal host API.
 * **User Interface:** Providing a ChatGPT-like web experience accessible from any browser on the network.
