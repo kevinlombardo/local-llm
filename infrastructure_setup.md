@@ -10,7 +10,7 @@ This project leverages the Unified Memory Architecture (UMA) of Apple Silicon to
 * **Storage:** 1TB SSD (NVMe speed for fast model loading)
 
 ## 2. Operating System Configuration
-The host runs **macOS Sequoia**, configured for headless operation (no physical display or peripherals attached).
+The host runs **macOS Tahoe**, configured for headless operation (no physical display or peripherals attached).
 
 ### Power Management
 To ensure 24/7 availability as an API server:
