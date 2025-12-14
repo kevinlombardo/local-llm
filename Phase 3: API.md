@@ -15,6 +15,8 @@ To ensure the `OLLAMA_HOST` environment variable persists across system reboots 
 ### 2.1 Configuration Injection
 The `EnvironmentVariables` dictionary was inserted into the property list (`.plist`) to define the host binding at the system service level.
 
+Note: The file /opt/homebrew/opt/ollama/homebrew.mxcl.ollama.plist was edited directly.
+
 **XML Block Added:**
 ```xml
 <key>EnvironmentVariables</key>
@@ -22,3 +24,14 @@ The `EnvironmentVariables` dictionary was inserted into the property list (`.pli
     <key>OLLAMA_HOST</key>
     <string>0.0.0.0</string>
 </dict>
+```
+## 3. Validation
+
+```bash
+curl http://192.168.1.XXX:11434/api/tags
+
+{"models":[{"name":"llama3.3:70b","model":"llama3.3:70b","modified_at":"2025-12-14T10:54:51.954265177-06:00","size":42520413916,"digest":"a6eb4748fd2990ad2952b2335a95a7f952d1a06119a0aa6a2df6cd052a93a3fa","details":{"parent_model":"","format":"gguf","family":"llama","families":["llama"],"parameter_size":"70.6B","quantization_level":"Q4_K_M"}}]}
+
+```
+
+
