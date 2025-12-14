@@ -62,3 +62,15 @@ brew services start ollama
 # Model Acquisition
 # Pulling the 70B parameter model requires stable throughput for ~40GB binary
 ollama pull llama3.3:70b
+```
+
+## 4. Performance Benchmarks
+**Model:** Llama 3.3 70B (4-bit Quantization)
+**Hardware:** Apple M4 Max (128GB Unified Memory)
+
+### Telemetry Data
+* **Token Generation Rate (Eval Rate):** 11.01 tokens/s
+    * *Significance:* Exceeds average human reading speed (~5-8 t/s), ensuring a fluid user experience for real-time chat.
+* **Prompt Processing (Prefill):** 44.72 tokens/s
+* **Cold Boot Load Time:** ~11.1 seconds
+    * *Note:* Time required to load ~42GB model weights from NVMe SSD to Unified Memory. Subsequent inference requests eliminate this latency (hot-swapping).
