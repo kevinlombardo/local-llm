@@ -13,6 +13,7 @@ The container environment was initialized with specific resource limits to ensur
 **Installation & Startup:**
 ```bash
 # Install Engine and Client
+```
 ```bash
 brew install docker colima
 ```
@@ -25,11 +26,11 @@ colima start --cpu 2 --memory 4
 ## 3. Application Deployment
 ```bash
 docker run -d \
-  -p 3000:8080 \
-  --add-host=host.docker.internal:host-gateway \
-  -v open-webui:/app/backend/data \
   --name open-webui \
+  -p 3000:8080 \
+  -v open-webui:/app/backend/data \
   --restart always \
+  -e OLLAMA_API_BASE_URL=http://host.docker.internal:11434 \
   ghcr.io/open-webui/open-webui:main
 ```
 
